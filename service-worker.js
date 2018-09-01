@@ -5,8 +5,8 @@
 
 'use strict';
 importScripts('./build/sw-toolbox.js');
-const version = "v1";
-const prev_version = "v0";
+const version = "v2";
+const prev_version = "v1";
 
 var clearInactiveCaches = function() {
     caches.keys().then(function(cacheNames) {
