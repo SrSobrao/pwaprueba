@@ -1,7 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Nav, Platform } from 'ionic-angular';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
+import { Nav, Platform, AlertController, LoadingController } from 'ionic-angular';
 
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
@@ -16,7 +14,9 @@ export class MyApp {
 
   pages: Array<{title: string, component: any}>;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
+  constructor(public platform: Platform,
+              private alertCtrl:AlertController,
+              private loadingCtrl:LoadingController) {
     this.initializeApp();
 
     // used for an example of ngFor and navigation
@@ -29,10 +29,37 @@ export class MyApp {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      this.statusBar.styleDefault();
-      this.splashScreen.hide();
+      console.log('platfrom ready');
+
+      window.addEventListener('appUpdate', (e:any) => {
+        let alert = this.alertCtrl.create({
+          title: 'Actualización',
+          message: 'Actualizar ahora a app?',
+          enableBackdropDismiss: false,
+          buttons: [
+            'Cancelar',
+            {
+              text: 'Actualizar',
+              handler: () => {
+                let loading = this.loadingCtrl.create({
+                  spinner: 'hide',
+                  content: `
+                    <div class="custom-spinner-container">
+                      <div class="custom-spinner-box"></div>
+                    </div>`,
+                  duration: 1500
+                });
+              
+                loading.onDidDismiss(() => {
+                  e.detail.postMessage({ updateSw: true });
+                });
+                loading.present();
+              }
+            }
+          ]
+        });
+        alert.present();
+      }, false);
     });
   }
 
